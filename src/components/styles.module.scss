@@ -1,0 +1,41 @@
+.functionContainer {
+    margin: 15px;
+    display: inline-block;
+    border: 2px solid #d4d8db;
+    border-radius: 4px;
+    text-align: center;
+
+    span {
+        text-decoration: underline;
+    }
+}
+
+.iconContainer {
+    display: flex;
+    margin: 15px;
+}
+
+.icon {
+    font-size: 35px;
+    color: #d4d8db;
+    margin-right: 15px;
+    cursor: pointer;
+
+    :hover {
+        color: red;
+    }
+
+    &--disabled {
+        color: rgba(212, 216, 219, 0.5);
+        cursor: default;
+
+        :hover {
+            color: inherit;
+        }
+    }
+
+    &--active {
+        color: red;
+        cursor: default;
+    }
+}

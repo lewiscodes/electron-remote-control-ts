@@ -1,26 +1,17 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from 'react';
+import Connect from './components/connect';
+import Connected from './components/connected';
+import styles from './styles.module.scss';
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+    const [ws, setWs] = useState<SocketIOClient.Socket>();
+
+    return (
+        <div className={styles.app}>
+            {!ws && <Connect setWs={setWs} />}
+            {ws && <Connected ws={ws} setWs={setWs} />}
+        </div>
+    );
 }
 
 export default App;
