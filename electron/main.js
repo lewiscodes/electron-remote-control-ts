@@ -20,8 +20,8 @@ function createWindow() {
     // console.log('robot', robot);
     // Create the browser window.
     mainWindow = new BrowserWindow({
-        width: 1500,
-        height: 1500,
+        width: 1600,
+        height: 600,
         webPreferences: {
             nodeIntegration: true,
             preload: __dirname + '/preload.js'

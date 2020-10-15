@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useRef } from 'react';
+import Peer from 'simple-peer';
 import { startScreenRecord } from './utils';
 
 interface IHostProps {
@@ -6,32 +7,31 @@ interface IHostProps {
 }
 
 const Host = ({ ws }: IHostProps): JSX.Element => {
-    const [isSharingScreen, setIsShardingScreen] = useState<boolean>(false);
-    const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder>();
-
-    const handleStartScreenShare = async() => {
-        setIsShardingScreen(true);
+    const handleCallGuest = async () => {
         const stream = await startScreenRecord();
-        const media = new MediaRecorder(stream!);
-        media.ondataavailable = (blob: BlobEvent) => {
-            console.log(blob.data);
-            ws.emit('screenshare', blob.data);
-        }
-        media.start(100);
-        setMediaRecorder(media);
-    }
+        console.log(stream);
 
-    const handleStopScreenShare = () => {
-        setIsShardingScreen(false);
-        mediaRecorder?.stop();
+        const peer = new Peer({
+            initiator: true,
+            trickle: false,
+            stream: stream
+        });
+
+        peer.on('signal', data => {
+            ws.emit('call-guest', data);
+        });
+
+        ws.on('call-accepted', (data: any) => {
+            peer.signal(data);
+        });
     }
 
     return (
         <div>
-            <h1 style={{ textAlign: 'center' }}>{`I AM THE HOST - ${isSharingScreen ? 'SHARING SCREEN' : 'NOT SHARING SCREEN'}`}</h1>
+            <h1 style={{ textAlign: 'center' }}>{`I AM THE HOST - `}</h1>
             <div style={{ display: 'flex', justifyContent: 'center' }}>
-                <button onClick={handleStartScreenShare} disabled={isSharingScreen}>Start Screen Share</button>
-                <button style={{ marginLeft: 10 }} onClick={handleStopScreenShare} disabled={!isSharingScreen}>Stop Screen Share</button>
+                <button onClick={handleCallGuest}>Call Guest</button>
+                {/* <button style={{ marginLeft: 10 }} onClick={handleStopScreenShare} disabled={!hasHostPeerSignal && !isSharingScreen}>Stop Screen Share</button> */}
             </div>
         </div>
     );

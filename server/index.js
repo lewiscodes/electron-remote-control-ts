@@ -26,7 +26,8 @@ app.get('/', (_req, res) => {
 const emitReady = (io) => io.emit('ready');
 const emitNotReady = (io) => io.emit('not-ready');
 const emitClientType = (socket, clientType) => socket.emit('client-type', clientType);
-const sendVideoToGuest = (io, video) => io.to(guestClient).emit('video', video);
+const sendHostPeerSignalToGuest = (io, hostPeerSignal) => io.to(guestClient).emit('call-received', hostPeerSignal);
+const sendGuestPeerSignalToHost = (io, guestPeerSignal) => io.to(hostClient).emit('call-accepted', guestPeerSignal);
 io.on('connection', (socket) => __awaiter(void 0, void 0, void 0, function* () {
     if (!hostClient) {
         hostClient = socket.id;
@@ -49,8 +50,11 @@ io.on('connection', (socket) => __awaiter(void 0, void 0, void 0, function* () {
             emitNotReady(io);
         }
     });
-    socket.on('screenshare', (data) => {
-        sendVideoToGuest(io, data);
+    socket.on('call-guest', (data) => {
+        sendHostPeerSignalToGuest(io, data);
+    });
+    socket.on('accept-call', (data) => {
+        sendGuestPeerSignalToHost(io, data);
     });
 }));
 server.listen(5000, () => {
