@@ -23,11 +23,19 @@ let guestClient;
 app.get('/', (_req, res) => {
     res.send('<h1>Hello world</h1>');
 });
+var EUserInputType;
+(function (EUserInputType) {
+    EUserInputType["Keyboard"] = "KEYBOARD";
+    EUserInputType["MouseMove"] = "MOUSE_MOVE";
+    EUserInputType["MouseClick"] = "MOUSE_CLICK";
+})(EUserInputType = exports.EUserInputType || (exports.EUserInputType = {}));
+;
 const emitReady = (io) => io.emit('ready');
 const emitNotReady = (io) => io.emit('not-ready');
 const emitClientType = (socket, clientType) => socket.emit('client-type', clientType);
 const sendHostPeerSignalToGuest = (io, hostPeerSignal) => io.to(guestClient).emit('call-received', hostPeerSignal);
 const sendGuestPeerSignalToHost = (io, guestPeerSignal) => io.to(hostClient).emit('call-accepted', guestPeerSignal);
+const sendUserInputToHost = (io, userInput) => io.to(hostClient).emit('host-user-input', userInput);
 io.on('connection', (socket) => __awaiter(void 0, void 0, void 0, function* () {
     if (!hostClient) {
         hostClient = socket.id;
@@ -55,6 +63,9 @@ io.on('connection', (socket) => __awaiter(void 0, void 0, void 0, function* () {
     });
     socket.on('accept-call', (data) => {
         sendGuestPeerSignalToHost(io, data);
+    });
+    socket.on('guest-user-input', (data) => {
+        sendUserInputToHost(io, data);
     });
 }));
 server.listen(5000, () => {

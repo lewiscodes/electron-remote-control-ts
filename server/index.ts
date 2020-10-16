@@ -13,11 +13,32 @@ app.get('/', (_req: Request, res: Response) => {
     res.send('<h1>Hello world</h1>');
 });
 
+export enum EUserInputType {
+    Keyboard = 'KEYBOARD',
+    MouseMove = 'MOUSE_MOVE',
+    MouseClick = 'MOUSE_CLICK'
+};
+
+interface IKeyboardEvent {
+    readonly key: string;
+}
+
+interface IMouseMoveEvent {
+    readonly x: number;
+    readonly y: number;
+}
+
+export interface IUserInput {
+    readonly userInputType: EUserInputType;
+    readonly event?: IKeyboardEvent | IMouseMoveEvent
+}
+
 const emitReady = (io: socketIo.Server) => io.emit('ready');
 const emitNotReady = (io: socketIo.Server) => io.emit('not-ready');
 const emitClientType = (socket: socketIo.Socket, clientType: 'HOST' | 'GUEST') => socket.emit('client-type', clientType);
 const sendHostPeerSignalToGuest = (io: socketIo.Server, hostPeerSignal: any) => io.to(guestClient!).emit('call-received', hostPeerSignal);
 const sendGuestPeerSignalToHost = (io: socketIo.Server, guestPeerSignal: any) => io.to(hostClient!).emit('call-accepted', guestPeerSignal);
+const sendUserInputToHost = (io: socketIo.Server, userInput: IUserInput) => io.to(hostClient!).emit('host-user-input', userInput);
 
 io.on('connection', async (socket: socketIo.Socket) => {
     if (!hostClient) {
@@ -50,6 +71,10 @@ io.on('connection', async (socket: socketIo.Socket) => {
 
     socket.on('accept-call', (data) => {
         sendGuestPeerSignalToHost(io, data)
+    })
+
+    socket.on('guest-user-input', (data) => {
+        sendUserInputToHost(io, data);
     })
 });
 
