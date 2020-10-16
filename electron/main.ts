@@ -14,8 +14,6 @@ const url = require('url');
 let mainWindow: electron.BrowserWindow | null;
 
 function createWindow() {
-    console.log('Electron Version:', process.version);
-    // console.log('robot', robot);
     // Create the browser window.
     mainWindow = new BrowserWindow({
         width: 1600,
@@ -41,29 +39,23 @@ function createWindow() {
     })
 }
 
-electron.ipcMain.on('remoteControl', (_e: electron.IpcMainEvent, userInputs: any[]) => {
-    for (let x = 0; x < userInputs.length; x++) {
-        const userInput = userInputs[x];
-        console.log(userInput);
-
-        switch (userInput.userInputType) {
-            case EUserInputType.Keyboard:
-                if (userInput?.event?.key && userInput.event.key.length === 1) {
-                    robot.typeString(userInput.event.key)
-                }
-                break;
-            case EUserInputType.MouseMove:
-                if (userInput?.event?.x && userInput?.event?.y) {
-                    // robot.moveMouseSmooth(userInput.event.x, userInput.event.y);
-                    robot.moveMouse(userInput.event.x, userInput.event.y);
-                }
-                break;
-            case EUserInputType.MouseClick:
-                robot.mouseClick('left');
-                break;
-            default:
-                break;
-        }
+electron.ipcMain.on('remoteControl', (_e: electron.IpcMainEvent, userInput: any) => {
+    switch (userInput.userInputType) {
+        case EUserInputType.Keyboard:
+            if (userInput?.event?.key && userInput.event.key.length === 1) {
+                robot.typeString(userInput.event.key)
+            }
+            break;
+        case EUserInputType.MouseMove:
+            if (userInput?.event?.x && userInput?.event?.y) {
+                robot.moveMouse(userInput.event.x, userInput.event.y);
+            }
+            break;
+        case EUserInputType.MouseClick:
+            robot.mouseClick('left');
+            break;
+        default:
+            break;
     }
 })
 

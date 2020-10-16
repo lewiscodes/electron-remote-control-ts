@@ -48,7 +48,6 @@ const Guest = ({ ws }: IGuestProps): JSX.Element => {
         ws.emit('guest-user-input', userInput)
     }
 
-
     const keyboardEventListener = useCallback((e: KeyboardEvent) => {
         const userInput: IUserInput = {
             userInputType: EUserInputType.Keyboard,

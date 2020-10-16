@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React from 'react';
 import Peer from 'simple-peer';
 import { startScreenRecord } from './utils';
 
@@ -6,10 +6,29 @@ interface IHostProps {
     readonly ws: SocketIOClient.Socket;
 }
 
+export enum EUserInputType {
+    Keyboard = 'KEYBOARD',
+    MouseMove = 'MOUSE_MOVE',
+    MouseClick = 'MOUSE_CLICK'
+};
+
+interface IKeyboardEvent {
+    readonly key: string;
+}
+
+interface IMouseMoveEvent {
+    readonly x: number;
+    readonly y: number;
+}
+
+export interface IUserInput {
+    readonly userInputType: EUserInputType;
+    readonly event?: IKeyboardEvent | IMouseMoveEvent
+}
+
 const Host = ({ ws }: IHostProps): JSX.Element => {
     const handleCallGuest = async () => {
         const stream = await startScreenRecord();
-        console.log(stream);
 
         const peer = new Peer({
             initiator: true,
@@ -24,6 +43,8 @@ const Host = ({ ws }: IHostProps): JSX.Element => {
         ws.on('call-accepted', (data: any) => {
             peer.signal(data);
         });
+
+        ws.on('host-user-input', (data: IUserInput) => window.ipcRenderer.send('remoteControl', data));
     }
 
     return (

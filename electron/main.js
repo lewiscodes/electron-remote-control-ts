@@ -16,8 +16,6 @@ const url = require('url');
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow;
 function createWindow() {
-    console.log('Electron Version:', process.version);
-    // console.log('robot', robot);
     // Create the browser window.
     mainWindow = new BrowserWindow({
         width: 1600,
@@ -39,29 +37,24 @@ function createWindow() {
         mainWindow = null;
     });
 }
-electron_1.default.ipcMain.on('remoteControl', (_e, userInputs) => {
+electron_1.default.ipcMain.on('remoteControl', (_e, userInput) => {
     var _a, _b, _c, _d, _f, _g;
-    for (let x = 0; x < userInputs.length; x++) {
-        const userInput = userInputs[x];
-        console.log(userInput);
-        switch (userInput.userInputType) {
-            case types_1.EUserInputType.Keyboard:
-                if (((_b = (_a = userInput) === null || _a === void 0 ? void 0 : _a.event) === null || _b === void 0 ? void 0 : _b.key) && userInput.event.key.length === 1) {
-                    robotjs_1.default.typeString(userInput.event.key);
-                }
-                break;
-            case types_1.EUserInputType.MouseMove:
-                if (((_d = (_c = userInput) === null || _c === void 0 ? void 0 : _c.event) === null || _d === void 0 ? void 0 : _d.x) && ((_g = (_f = userInput) === null || _f === void 0 ? void 0 : _f.event) === null || _g === void 0 ? void 0 : _g.y)) {
-                    // robot.moveMouseSmooth(userInput.event.x, userInput.event.y);
-                    robotjs_1.default.moveMouse(userInput.event.x, userInput.event.y);
-                }
-                break;
-            case types_1.EUserInputType.MouseClick:
-                robotjs_1.default.mouseClick('left');
-                break;
-            default:
-                break;
-        }
+    switch (userInput.userInputType) {
+        case types_1.EUserInputType.Keyboard:
+            if (((_b = (_a = userInput) === null || _a === void 0 ? void 0 : _a.event) === null || _b === void 0 ? void 0 : _b.key) && userInput.event.key.length === 1) {
+                robotjs_1.default.typeString(userInput.event.key);
+            }
+            break;
+        case types_1.EUserInputType.MouseMove:
+            if (((_d = (_c = userInput) === null || _c === void 0 ? void 0 : _c.event) === null || _d === void 0 ? void 0 : _d.x) && ((_g = (_f = userInput) === null || _f === void 0 ? void 0 : _f.event) === null || _g === void 0 ? void 0 : _g.y)) {
+                robotjs_1.default.moveMouse(userInput.event.x, userInput.event.y);
+            }
+            break;
+        case types_1.EUserInputType.MouseClick:
+            robotjs_1.default.mouseClick('left');
+            break;
+        default:
+            break;
     }
 });
 // This method will be called when Electron has finished
